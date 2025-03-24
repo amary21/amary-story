@@ -5,8 +5,7 @@ import 'package:amary_story/feature/detail/detail_provider.dart';
 import 'package:amary_story/feature/home/home_provider.dart';
 import 'package:amary_story/feature/login/login_provider.dart';
 import 'package:amary_story/feature/register/register_provider.dart';
-import 'package:amary_story/route/nav_host.dart';
-import 'package:amary_story/route/nav_provider.dart';
+import 'package:amary_story/route/nav_route_delegate.dart';
 import 'package:amary_story/style/theme/story_theme.dart';
 import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:flutter/material.dart';
@@ -23,15 +22,6 @@ void main() async {
         ...storyModule(
           baseUrl: "https://story-api.dicoding.dev/v1",
           preferences: preferences,
-        ),
-        ChangeNotifierProxyProvider<StoryRepository, NavProvider>(
-          create:
-              (context) =>
-                  NavProvider(repository: context.read<StoryRepository>()),
-          update:
-              (_, storyRepository, previous) =>
-                  NavProvider(repository: storyRepository)
-                  ..init(),
         ),
         ChangeNotifierProxyProvider<StoryRepository, RegisterProvider>(
           create:
@@ -79,24 +69,35 @@ void main() async {
   );
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<NavProvider>(
-      builder: (_, provider, _) {
-        return MaterialApp(
-          title: 'Amary Cafe',
-          theme: StoryTheme.lightTheme,
-          darkTheme: StoryTheme.darkTheme,
-          themeMode: ThemeMode.system,
-          initialRoute: NavHost.initialHost(provider.isReadyToken),
-          routes: NavHost.host,
-          navigatorObservers: [ChuckerFlutter.navigatorObserver],
+  State<MainApp> createState() => _MainAppState();
+}
 
-        );
-      },
+class _MainAppState extends State<MainApp> {
+  late NavRouteDelegate navRouteDelegate;
+
+  @override
+  void initState() {
+    final repository = context.read<StoryRepository>();
+    navRouteDelegate = NavRouteDelegate(repository: repository);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Amary Cafe',
+      theme: StoryTheme.lightTheme,
+      darkTheme: StoryTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      navigatorObservers: [ChuckerFlutter.navigatorObserver],
+      home: Router(
+        routerDelegate: navRouteDelegate,
+        backButtonDispatcher: RootBackButtonDispatcher(),
+      ),
     );
   }
 }

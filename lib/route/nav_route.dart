@@ -1,9 +1,9 @@
 enum NavRoute {
-  mainRoute("/"),
-  registerRoute("/register"),
-  homeRoute("/home"),
-  detailRoute("/detail"),
-  addRoute("/add");
+  mainRoute("LoginRoute"),
+  registerRoute("RegisterRoute"),
+  homeRoute("HomeRoute"),
+  detailRoute("DetailRoute"),
+  addRoute("AddRoute");
 
   const NavRoute(this.name);
   final String name;

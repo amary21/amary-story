@@ -1,6 +1,5 @@
 import 'package:amary_story/feature/register/register_provider.dart';
 import 'package:amary_story/feature/register/register_state.dart';
-import 'package:amary_story/route/nav_route.dart';
 import 'package:amary_story/widget/button/button_widget.dart';
 import 'package:amary_story/widget/toast/toast_enum.dart';
 import 'package:amary_story/widget/toast/toast_widget.dart';
@@ -8,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  final Function() onLogin;
+
+  const RegisterScreen({super.key, required this.onLogin});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -37,7 +38,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 break;
               case RegisterLoadedState(message: var message):
                 showToast(context, ToastEnum.success, message);
-                Navigator.pushNamed(context, NavRoute.mainRoute.name);
+                widget.onLogin();
+                break;
               case _:
                 break;
             }
@@ -123,9 +125,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     Text("Have an account?  "),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
+                      onTap: widget.onLogin,
                       child: Text(
                         'Log In',
                         style: TextStyle(color: Colors.blue),

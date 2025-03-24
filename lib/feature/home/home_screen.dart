@@ -1,13 +1,16 @@
 import 'package:amary_story/feature/home/home_provider.dart';
 import 'package:amary_story/feature/home/home_state.dart';
-import 'package:amary_story/route/nav_route.dart';
 import 'package:amary_story/widget/toast/toast_enum.dart';
 import 'package:amary_story/widget/toast/toast_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Function(String) onDetail;
+  final Function onAddStory;
+  final Function onLogout;
+
+  const HomeScreen({super.key, required this.onDetail, required this.onAddStory, required this.onLogout});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -48,9 +51,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          IconButton(icon: Icon(Icons.add_box_outlined), onPressed: () {
-            Navigator.pushNamed(context, NavRoute.addRoute.name);
-          }),
+          IconButton(
+            icon: Icon(Icons.add_box_outlined),
+            onPressed: () {
+              widget.onAddStory();
+            },
+          ),
         ],
       ),
       body: Consumer<HomeProvider>(
@@ -58,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (provider.isLogout) {
               showToast(context, ToastEnum.success, "Anda berhasil logout");
-              Navigator.pushNamed(context, NavRoute.mainRoute.name);
+              widget.onLogout();
             }
           });
 
@@ -72,11 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       final story = stories[index];
                       return GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            NavRoute.detailRoute.name,
-                            arguments: story.id,
-                          );
+                          widget.onDetail(story.id);
                         },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,6 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Text(
                                 story.description,
                                 style: TextStyle(fontSize: 14),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -139,6 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             TextButton(
               onPressed: () async {
+                Navigator.pop(context);
                 await context.read<HomeProvider>().logout();
               },
               child: Text("Logout", style: TextStyle(color: Colors.red)),

@@ -20,8 +20,6 @@ class LoginProvider extends ChangeNotifier {
   bool _isEnableButton = false;
   bool get isEnableButton => _isEnableButton;
 
-  bool _isGetReadyToken = true;
-  bool get isGetReadyToken => _isGetReadyToken;
 
   set email(String value) {
     _email = value;
@@ -70,15 +68,5 @@ class LoginProvider extends ChangeNotifier {
     _password = "";
     _isEnableButton = false;
     notifyListeners();
-  }
-
-  Future<bool> isReadyToken() async {
-    try {
-      String token = await _repository.getToken();
-      _isGetReadyToken = token.isNotEmpty;
-      return _isGetReadyToken;
-    } catch (e) {
-      return false;
-    }
   }
 }

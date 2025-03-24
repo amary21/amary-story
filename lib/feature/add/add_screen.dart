@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:amary_story/feature/add/add_provider.dart';
 import 'package:amary_story/feature/add/add_state.dart';
-import 'package:amary_story/route/nav_route.dart';
 import 'package:amary_story/widget/button/button_widget.dart';
 import 'package:amary_story/widget/toast/toast_enum.dart';
 import 'package:amary_story/widget/toast/toast_widget.dart';
@@ -11,7 +10,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class AddScreen extends StatefulWidget {
-  const AddScreen({super.key});
+  final Function() onHome;
+  final Function() onBack;
+
+  const AddScreen({super.key, required this.onHome, required this.onBack});
 
   @override
   State<AddScreen> createState() => _AddScreenState();
@@ -23,7 +25,13 @@ class _AddScreenState extends State<AddScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("New Story")),
+      appBar: AppBar(
+        title: Text("New Story"),
+        leading: IconButton(
+          onPressed: widget.onBack,
+          icon: Icon(Icons.arrow_back),
+        ),
+      ),
       body: Consumer<AddProvider>(
         builder: (contex, provider, _) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -33,7 +41,8 @@ class _AddScreenState extends State<AddScreen> {
                 break;
               case AddLoadedState(message: var message):
                 showToast(context, ToastEnum.success, message);
-                Navigator.pushNamed(context, NavRoute.homeRoute.name);
+                widget.onHome();
+                break;
               case _:
                 break;
             }

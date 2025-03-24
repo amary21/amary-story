@@ -5,8 +5,9 @@ import 'package:provider/provider.dart';
 
 class DetailScreen extends StatefulWidget {
   final String id;
+  final Function() onBack;
 
-  const DetailScreen({super.key, required this.id});
+  const DetailScreen({super.key, required this.id, required this.onBack});
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
@@ -27,6 +28,10 @@ class _DetailScreenState extends State<DetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Detail Story"),
+        leading: IconButton(
+          onPressed: widget.onBack,
+          icon: Icon(Icons.arrow_back),
+        )
       ),
       body: Consumer<DetailProvider>(
         builder: (context, provider, _) {
