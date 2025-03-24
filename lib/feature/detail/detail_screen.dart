@@ -1,6 +1,5 @@
 import 'package:amary_story/feature/detail/detail_provider.dart';
 import 'package:amary_story/feature/detail/detail_state.dart';
-import 'package:amary_story/route/nav_route.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
