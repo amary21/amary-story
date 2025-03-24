@@ -48,11 +48,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          IconButton(icon: Icon(Icons.add_box_outlined), onPressed: () {}),
+          IconButton(icon: Icon(Icons.add_box_outlined), onPressed: () {
+            Navigator.pushNamed(context, NavRoute.addRoute.name);
+          }),
         ],
       ),
       body: Consumer<HomeProvider>(
-        builder: (context, provider, _) {
+        builder: (_, provider, _) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (provider.isLogout) {
               showToast(context, ToastEnum.success, "Anda berhasil logout");
@@ -70,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       final story = stories[index];
                       return GestureDetector(
                         onTap: () {
-                          Navigator.pushReplacementNamed(
+                          Navigator.pushNamed(
                             context,
                             NavRoute.detailRoute.name,
                             arguments: story.id,

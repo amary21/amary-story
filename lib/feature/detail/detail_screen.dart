@@ -1,5 +1,6 @@
 import 'package:amary_story/feature/detail/detail_provider.dart';
 import 'package:amary_story/feature/detail/detail_state.dart';
+import 'package:amary_story/route/nav_route.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +27,7 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Detail Story")
+        title: Text("Detail Story"),
       ),
       body: Consumer<DetailProvider>(
         builder: (context, provider, _) {
@@ -93,10 +94,18 @@ class _DetailScreenState extends State<DetailScreen> {
                       children: [
                         Icon(Icons.location_on, color: Colors.red),
                         const SizedBox(width: 8),
-                        Text(
-                          "Lat: ${story.lat}, Lon: ${story.lon}",
-                          style: TextStyle(fontSize: 14),
-                        ),
+                        Column(
+                          children: [
+                            Text(
+                              "Lat: ${story.lat}",
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            Text(
+                              "Lon: ${story.lon}",
+                              style: TextStyle(fontSize: 14),
+                            ),
+                          ],
+                        )
                       ],
                     ),
                   ),

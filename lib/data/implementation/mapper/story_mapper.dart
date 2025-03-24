@@ -10,6 +10,8 @@ extension StoryMapper on StoryResponse {
       description: description,
       photoUrl: photoUrl,
       createdAt: _formatDateTime(createdAt),
+      lat: lat,
+      lon: lon,
     );
   }
 

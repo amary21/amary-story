@@ -99,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 32),
                   ButtonWidget(
-                    isLoading: provider.state is LoginLoadedState,
+                    isLoading: provider.state is LoginLoadingState,
                     isEnable: provider.isEnableButton,
                     textButton: "Log In",
                     onTap: () async {

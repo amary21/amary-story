@@ -1,0 +1,64 @@
+import 'dart:io';
+
+import 'package:amary_story/data/api/repository/story_repository.dart';
+import 'package:amary_story/feature/add/add_state.dart';
+import 'package:flutter/material.dart';
+
+class AddProvider extends ChangeNotifier {
+  final StoryRepository _repository;
+
+  AddProvider({required StoryRepository repository}) : _repository = repository;
+
+  String _description = "";
+  String get description => _description;
+
+  File? _image;
+
+  bool _isEnableButton = false;
+  bool get isEnableButton => _isEnableButton;
+
+  AddState _state = AddNoneState();
+  AddState get state => _state;
+
+  set description(String value) {
+    _description = value;
+    notifyListeners();
+
+    _checkButton();
+  }
+
+  set image(File value) {
+    _image = value;
+    notifyListeners();
+
+    _checkButton();
+  }
+
+  void _checkButton() {
+    if (_description.isNotEmpty && _image != null) {
+      _isEnableButton = true;
+    } else {
+      _isEnableButton = false;
+    }
+    notifyListeners();
+  }
+
+  Future<void> upload() async {
+    try {
+      _state = AddLoadingState();
+      notifyListeners();
+
+      final result = await _repository.addStory(description, _image!);
+      _state = AddLoadedState(message: result);
+      notifyListeners();
+    } catch (e) {
+      _state = AddErrorState(message: e.toString());
+      notifyListeners();
+    }
+  }
+
+  void resetToast() {
+    _state = AddNoneState();
+    notifyListeners();
+  }
+}

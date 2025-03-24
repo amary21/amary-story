@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:amary_story/data/api/model/story.dart';
 import 'package:amary_story/data/api/repository/story_repository.dart';
+import 'package:amary_story/data/implementation/helper/image_compress.dart';
 import 'package:amary_story/data/implementation/mapper/story_mapper.dart';
 import 'package:amary_story/data/implementation/preference/story_preference.dart';
 import 'package:amary_story/data/implementation/remote/api/story_api.dart';
@@ -28,10 +29,14 @@ class StoryRepositoryImpl implements StoryRepository {
   }) async {
     try {
       String token = await _storyPreference.getToken();
+      final File imageCompressed = await imageCompress(photo);
+
       BaseResponse<void> response = await _storyApi.addStory(
         token,
         description,
-        photo,
+        imageCompressed,
+        lat: lat,
+        lon: lon,
       );
 
       return response.message;
@@ -69,7 +74,8 @@ class StoryRepositoryImpl implements StoryRepository {
       if (response.error) {
         return Future.error(response.message);
       } else {
-        return response.data?.toStory() ??
+        Story story =
+            response.data?.toStory() ??
             Story(
               id: "",
               name: "",
@@ -77,6 +83,7 @@ class StoryRepositoryImpl implements StoryRepository {
               photoUrl: "",
               createdAt: "",
             );
+        return story;
       }
     } catch (e) {
       return Future.error(e);

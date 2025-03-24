@@ -1,3 +1,4 @@
+import 'package:amary_story/feature/add/add_screen.dart';
 import 'package:amary_story/feature/detail/detail_screen.dart';
 import 'package:amary_story/feature/home/home_screen.dart';
 import 'package:amary_story/feature/login/login_screen.dart';
@@ -22,6 +23,7 @@ class NavHost {
       NavRoute.detailRoute.name: (context) => DetailScreen(
             id: ModalRoute.of(context)?.settings.arguments as String,
           ),
+      NavRoute.addRoute.name: (_) => AddScreen(),
     };
   }
 }
