@@ -13,7 +13,7 @@ abstract class StoryApi {
 
   Future<BaseResponse<LoginResponse>> login(String email, String password);
 
-  Future<BaseResponse<List<StoryResponse>>> fetchStories(String token);
+  Future<BaseResponse<List<StoryResponse>>> fetchStories(String token, int page, int size);
 
   Future<BaseResponse<void>> addStory(
     String token,

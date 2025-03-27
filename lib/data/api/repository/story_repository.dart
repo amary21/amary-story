@@ -7,7 +7,7 @@ abstract class StoryRepository {
 
   Future<String> login(String email, String password);
 
-  Future<List<Story>> fetchStories();
+  Future<List<Story>> fetchStories(int page, int size);
 
   Future<String> addStory(
     String description,

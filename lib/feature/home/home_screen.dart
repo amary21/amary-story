@@ -10,21 +10,45 @@ class HomeScreen extends StatefulWidget {
   final Function onAddStory;
   final Function onLogout;
 
-  const HomeScreen({super.key, required this.onDetail, required this.onAddStory, required this.onLogout});
+  const HomeScreen({
+    super.key,
+    required this.onDetail,
+    required this.onAddStory,
+    required this.onLogout,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
+    super.initState();
+
     final HomeProvider provider = context.read<HomeProvider>();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        final state = provider.state;
+        if (state is HomeLoadedState && state.hasMore) {
+          provider.fetchStories(isLoadMore: true);
+        }
+      }
+    });
+
     Future.microtask(() {
       provider.init();
     });
+  }
 
-    super.initState();
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -67,15 +91,24 @@ class _HomeScreenState extends State<HomeScreen> {
               widget.onLogout();
             }
           });
+          final state = provider.state;
 
-          return switch (provider.state) {
-            HomeLoadedState(stories: var stories) => Column(
+          if (state is HomeLoadingState) {
+            return Center(child: CircularProgressIndicator());
+          } else if (state is HomeErrorState) {
+            return Center(child: Text(state.message));
+          } else if (state is HomeLoadedState) {
+            return Column(
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemCount: stories.length,
+                    itemCount: state.stories.length + (state.hasMore ? 1 : 0),
+                    controller: _scrollController,
                     itemBuilder: (context, index) {
-                      final story = stories[index];
+                      if (index == state.stories.length) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      final story = state.stories[index];
                       return GestureDetector(
                         onTap: () {
                           widget.onDetail(story.id);
@@ -113,15 +146,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ],
-            ),
-            HomeLoadingState() => const Center(
-              child: CircularProgressIndicator(),
-            ),
-            HomeErrorState(message: var message) => Center(
-              child: Text(message),
-            ),
-            _ => SizedBox(),
-          };
+            );
+          }
+          return SizedBox();
         },
       ),
     );

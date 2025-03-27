@@ -96,9 +96,13 @@ class StoryApiImpl implements StoryApi {
   }
 
   @override
-  Future<BaseResponse<List<StoryResponse>>> fetchStories(String token) async {
+  Future<BaseResponse<List<StoryResponse>>> fetchStories(
+      String token,
+      int page,
+      int size,
+  ) async {
     final response = await _client.get(
-      Uri.parse("$_baseUrl/stories"),
+      Uri.parse("$_baseUrl/stories?page=$page&size=$size&location=1"),
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token",

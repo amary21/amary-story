@@ -46,11 +46,13 @@ class StoryRepositoryImpl implements StoryRepository {
   }
 
   @override
-  Future<List<Story>> fetchStories() async {
+  Future<List<Story>> fetchStories(int page, int size) async {
     try {
       String token = await _storyPreference.getToken();
       BaseResponse<List<StoryResponse>> response = await _storyApi.fetchStories(
         token,
+        page,
+        size,
       );
       if (response.error) {
         return Future.error(response.message);
