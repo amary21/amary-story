@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:amary_story/data/implementation/remote/api/story_api.dart';
-import 'package:amary_story/data/implementation/remote/response/base_response.dart';
+import 'package:amary_story/data/implementation/remote/response/general_response.dart';
 import 'package:amary_story/data/implementation/remote/response/login_response.dart';
+import 'package:amary_story/data/implementation/remote/response/login_result_response.dart';
+import 'package:amary_story/data/implementation/remote/response/stories_response.dart';
+import 'package:amary_story/data/implementation/remote/response/stories_result_response.dart';
 import 'package:amary_story/data/implementation/remote/response/story_response.dart';
 import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -18,21 +21,14 @@ class StoryApiImpl implements StoryApi {
   final http.Client _client = ChuckerHttpClient(http.Client());
 
   @override
-  Future<BaseResponse<LoginResponse>> login(
-    String email,
-    String password,
-  ) async {
+  Future<LoginResultResponse> login(String email, String password) async {
     final response = await _client.post(
       Uri.parse("$_baseUrl/login"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"email": email, "password": password}),
     );
     if (response.statusCode == 200) {
-      return BaseResponse<LoginResponse>.fromJson(
-        jsonDecode(response.body),
-        (json) => LoginResponse.fromJson(json),
-        "loginResult"
-      );
+      return LoginResultResponse.fromJson(jsonDecode(response.body));
     } else {
       Map<String, dynamic> json = jsonDecode(response.body);
       return Future.error(json["message"]);
@@ -40,7 +36,7 @@ class StoryApiImpl implements StoryApi {
   }
 
   @override
-  Future<BaseResponse<void>> register(
+  Future<GeneralResponse> register(
     String name,
     String password,
     String email,
@@ -52,7 +48,7 @@ class StoryApiImpl implements StoryApi {
     );
 
     if (response.statusCode == 201) {
-      return BaseResponse<void>.fromJson(jsonDecode(response.body), null, null);
+      return GeneralResponse.fromJson(jsonDecode(response.body));
     } else {
       Map<String, dynamic> json = jsonDecode(response.body);
       return Future.error(json["message"]);
@@ -60,7 +56,7 @@ class StoryApiImpl implements StoryApi {
   }
 
   @override
-  Future<BaseResponse<void>> addStory(
+  Future<GeneralResponse> addStory(
     String token,
     String description,
     File photo, {
@@ -89,18 +85,14 @@ class StoryApiImpl implements StoryApi {
 
     if (response.statusCode == 201) {
       final responseBody = await response.stream.bytesToString();
-      return BaseResponse<void>.fromJson(jsonDecode(responseBody), null, null);
+      return GeneralResponse.fromJson(jsonDecode(responseBody));
     } else {
       return Future.error("Failed to add story");
     }
   }
 
   @override
-  Future<BaseResponse<List<StoryResponse>>> fetchStories(
-      String token,
-      int page,
-      int size,
-  ) async {
+  Future<StoriesResponse> fetchStories(String token, int page, int size) async {
     final response = await _client.get(
       Uri.parse("$_baseUrl/stories?page=$page&size=$size&location=1"),
       headers: {
@@ -110,16 +102,7 @@ class StoryApiImpl implements StoryApi {
     );
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> decoded = jsonDecode(response.body);
-      final List<StoryResponse> stories =
-          (decoded['listStory'] as List)
-              .map((json) => StoryResponse.fromJson(json))
-              .toList();
-      return BaseResponse<List<StoryResponse>>(
-        error: decoded['error'],
-        message: decoded['message'],
-        data: stories,
-      );
+      return StoriesResponse.fromJson(jsonDecode(response.body));
     } else {
       Map<String, dynamic> json = jsonDecode(response.body);
       return Future.error(json["message"]);
@@ -127,7 +110,7 @@ class StoryApiImpl implements StoryApi {
   }
 
   @override
-  Future<BaseResponse<StoryResponse>> fetchStoryDetail(
+  Future<StoriesResultResponse> fetchStoryDetail(
     String token,
     String id,
   ) async {
@@ -140,11 +123,7 @@ class StoryApiImpl implements StoryApi {
     );
 
     if (response.statusCode == 200) {
-      return BaseResponse<StoryResponse>.fromJson(
-        jsonDecode(response.body),
-        (json) => StoryResponse.fromJson(json),
-        "story"
-      );
+      return StoriesResultResponse.fromJson(jsonDecode(response.body));
     } else {
       Map<String, dynamic> json = jsonDecode(response.body);
       return Future.error(json["message"]);

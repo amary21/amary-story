@@ -6,9 +6,10 @@ import 'package:amary_story/data/implementation/helper/image_compress.dart';
 import 'package:amary_story/data/implementation/mapper/story_mapper.dart';
 import 'package:amary_story/data/implementation/preference/story_preference.dart';
 import 'package:amary_story/data/implementation/remote/api/story_api.dart';
-import 'package:amary_story/data/implementation/remote/response/base_response.dart';
-import 'package:amary_story/data/implementation/remote/response/login_response.dart';
-import 'package:amary_story/data/implementation/remote/response/story_response.dart';
+import 'package:amary_story/data/implementation/remote/response/general_response.dart';
+import 'package:amary_story/data/implementation/remote/response/login_result_response.dart';
+import 'package:amary_story/data/implementation/remote/response/stories_response.dart';
+import 'package:amary_story/data/implementation/remote/response/stories_result_response.dart';
 
 class StoryRepositoryImpl implements StoryRepository {
   final StoryApi _storyApi;
@@ -31,7 +32,7 @@ class StoryRepositoryImpl implements StoryRepository {
       String token = await _storyPreference.getToken();
       final File imageCompressed = await imageCompress(photo);
 
-      BaseResponse<void> response = await _storyApi.addStory(
+      GeneralResponse response = await _storyApi.addStory(
         token,
         description,
         imageCompressed,
@@ -49,7 +50,7 @@ class StoryRepositoryImpl implements StoryRepository {
   Future<List<Story>> fetchStories(int page, int size) async {
     try {
       String token = await _storyPreference.getToken();
-      BaseResponse<List<StoryResponse>> response = await _storyApi.fetchStories(
+      StoriesResponse response = await _storyApi.fetchStories(
         token,
         page,
         size,
@@ -57,8 +58,7 @@ class StoryRepositoryImpl implements StoryRepository {
       if (response.error) {
         return Future.error(response.message);
       } else {
-        return response.data?.map((element) => element.toStory()).toList() ??
-            [];
+        return response.data.map((element) => element.toStory()).toList();
       }
     } catch (e) {
       return Future.error(e);
@@ -69,23 +69,14 @@ class StoryRepositoryImpl implements StoryRepository {
   Future<Story> fetchStoryDetail(String id) async {
     try {
       String token = await _storyPreference.getToken();
-      BaseResponse<StoryResponse> response = await _storyApi.fetchStoryDetail(
+      StoriesResultResponse response = await _storyApi.fetchStoryDetail(
         token,
         id,
       );
       if (response.error) {
         return Future.error(response.message);
       } else {
-        Story story =
-            response.data?.toStory() ??
-            Story(
-              id: "",
-              name: "",
-              description: "",
-              photoUrl: "",
-              createdAt: "",
-            );
-        return story;
+        return response.data.toStory();
       }
     } catch (e) {
       return Future.error(e);
@@ -95,7 +86,7 @@ class StoryRepositoryImpl implements StoryRepository {
   @override
   Future<String> login(String email, String password) async {
     try {
-      BaseResponse<LoginResponse> response = await _storyApi.login(
+      LoginResultResponse response = await _storyApi.login(
         email,
         password,
       );
@@ -103,8 +94,8 @@ class StoryRepositoryImpl implements StoryRepository {
       if (response.error) {
         return Future.error(response.message);
       } else {
-        await _storyPreference.setToken(response.data?.token ?? "");
-        await _storyPreference.setName(response.data?.name ?? "");
+        await _storyPreference.setToken(response.data.token);
+        await _storyPreference.setName(response.data.name);
         return response.message;
       }
     } catch (e) {
@@ -115,7 +106,7 @@ class StoryRepositoryImpl implements StoryRepository {
   @override
   Future<String> register(String name, String password, String email) async {
     try {
-      BaseResponse<void> response = await _storyApi.register(
+      GeneralResponse response = await _storyApi.register(
         name,
         password,
         email,
