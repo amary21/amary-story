@@ -33,10 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        final state = provider.state;
-        if (state is HomeLoadedState && state.hasMore) {
-          provider.fetchStories(isLoadMore: true);
-        }
+        provider.fetchStories();
       }
     });
 
@@ -78,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: Icon(Icons.add_box_outlined),
             onPressed: () {
+              context.read<HomeProvider>().resetPaging();
               widget.onAddStory();
             },
           ),
@@ -87,30 +85,39 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_, provider, _) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (provider.isLogout) {
+              context.read<HomeProvider>().resetPaging();
               showToast(context, ToastEnum.success, "Anda berhasil logout");
               widget.onLogout();
             }
           });
           final state = provider.state;
 
-          if (state is HomeLoadingState) {
+          if (state is HomeLoadingState && provider.page == 1) {
             return Center(child: CircularProgressIndicator());
           } else if (state is HomeErrorState) {
             return Center(child: Text(state.message));
           } else if (state is HomeLoadedState) {
+            final stories = provider.stories;
             return Column(
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemCount: state.stories.length + (state.hasMore ? 1 : 0),
                     controller: _scrollController,
+                    itemCount: provider.stories.length + (provider.page != null ? 1 : 0),
                     itemBuilder: (context, index) {
-                      if (index == state.stories.length) {
-                        return Center(child: CircularProgressIndicator());
+                      if (index == stories.length && provider.page != null) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(8),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
                       }
-                      final story = state.stories[index];
+
+                      final story = stories[index];
                       return GestureDetector(
                         onTap: () {
+                          context.read<HomeProvider>().resetPaging();
                           widget.onDetail(story.id);
                         },
                         child: Column(
