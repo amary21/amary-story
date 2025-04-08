@@ -56,7 +56,7 @@ class AddProvider extends ChangeNotifier {
       _state = AddLoadingState();
       notifyListeners();
 
-      final result = await _repository.addStory(description, _image!);
+      final result = await _repository.addStory(description, _image!, lat: latitude, lon: longitude);
       _state = AddLoadedState(message: result);
       notifyListeners();
     } catch (e) {

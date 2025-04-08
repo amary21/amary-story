@@ -24,7 +24,7 @@ class DetailProvider extends ChangeNotifier {
 
       final result = await _repository.fetchStoryDetail(id);
       _state = DetailLoadedState(story: result);
-      _loadLocation(result.lat!, result.lon!);
+      _loadLocation(result.lat, result.lon);
       notifyListeners();
     } catch (e) {
       _state = DetailErrorState(message: e.toString());
@@ -32,8 +32,12 @@ class DetailProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> _loadLocation(double lat, double lon) async {
+  Future<void> _loadLocation(double? lat, double? lon) async {
     try {
+      if (lat == null || lon == null) {
+        return;
+      }
+
       final placemarks = await geo.placemarkFromCoordinates(lat, lon);
       final place = placemarks.isNotEmpty ? placemarks.first : null;
 
