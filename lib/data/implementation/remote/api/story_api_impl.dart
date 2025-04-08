@@ -3,11 +3,9 @@ import 'dart:io';
 
 import 'package:amary_story/data/implementation/remote/api/story_api.dart';
 import 'package:amary_story/data/implementation/remote/response/general_response.dart';
-import 'package:amary_story/data/implementation/remote/response/login_response.dart';
 import 'package:amary_story/data/implementation/remote/response/login_result_response.dart';
 import 'package:amary_story/data/implementation/remote/response/stories_response.dart';
 import 'package:amary_story/data/implementation/remote/response/stories_result_response.dart';
-import 'package:amary_story/data/implementation/remote/response/story_response.dart';
 import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
